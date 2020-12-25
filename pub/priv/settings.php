@@ -1,3 +1,3 @@
 <?php
-	echo "Hello!"
+	require "src/static/templates/settings.html";
 ?>
