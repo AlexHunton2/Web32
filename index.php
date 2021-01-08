@@ -1,7 +1,7 @@
 <?php
 	if (session_status() === PHP_SESSION_NONE){session_start();}
 	$pages = [
-	    "" => "main.php",
+	    "" => "main.php", 
 	    "/" => "main.php",
 	    "/main" => "main.php",
 	    "/login" => "login.php", 
@@ -26,6 +26,8 @@
 
 	require "src/config.php";
 	
+	require "src/static/header.html";
+
 	#TODO: Safe guard for any files within priv. All priv files require a session.
 	$root = "User-root/AAC/";
 	$request = substr($_SERVER['REQUEST_URI'], strlen($root));
@@ -39,7 +41,5 @@
 
 	}
 	if (!$found) { require "pub/404.php"; }
-
-	require "src/static/header.html";
 ?>
 

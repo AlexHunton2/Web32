@@ -4,6 +4,9 @@
 
 	echo <<<_END
 		<br>
-		<div id="like_button_container"></div>
+		<div id="led_button_container"></div>
+		
+		<div id="content"></div>
+		<script src="./dist/dist/bundle.js"></script>
 	_END;
 ?>
