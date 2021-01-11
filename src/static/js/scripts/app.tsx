@@ -1,17 +1,17 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { render } from "react-dom";
-import { WidgetTest } from "./widget"
 import { LEDButton } from "./led_button"
+import { WidgetAggretator, Widget } from "./widget";
 
 
 class App extends React.Component<{}, {}> {
     render() {
-        var testing = new WidgetTest();
-        testing.render("test!");
+        var aggretator = WidgetAggretator.getInstance();
 
         return (
             <div className="app">  
+                {aggretator.renderBackground()}        
             </div> 
         )
     }
