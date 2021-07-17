@@ -1,5 +1,5 @@
 <?php
-	class validation {
+	class Validation {
 		static public function validate_username($field) {
 			if ($field == "") return "No username entered";
 			else if (strlen($field) < 5)

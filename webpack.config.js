@@ -2,7 +2,8 @@ module.exports = {
   // change to .tsx if necessary
   entry: './src/static/js/scripts/app.tsx',
   output: {
-    filename: './dist/bundle.js'
+    filename: './dist/bundle.js',
+    publicPath: './dist/'
   },
   resolve: {
     // changed from extensions: [".js", ".jsx"]
@@ -19,5 +20,6 @@ module.exports = {
   },
   externals: {},
   // addition - add source-map support
-  devtool: "source-map"
+  devtool: "source-map",
+  mode: 'development'
 }

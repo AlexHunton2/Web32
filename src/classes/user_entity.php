@@ -1,5 +1,5 @@
 <?php
-	class user_entity {
+	class User_Entity {
 		private $username;
 		private $user_id;
 

