@@ -8,8 +8,8 @@
 		$result = $login_db->signIn($_POST['user'], $_POST['pass']);
 		if ($result) {
 			Alerts::createAlert('success', 'Success! You are logged in!');
-			//TODO: ADD SESSION TIMEOUT SYSTEM. GOOD LUCK <3
-			$user_entity = new User_Entity($result['username'], $result['user_id']);
+			$user_id = $login_db->getUserIDFromUsername($_POST['user']);
+			$user_entity = new User_Entity($_POST['user'], $user_id);
 			$_SESSION['user_entity'] = serialize($user_entity); //Important to serialize user_entity object
 			Redirect::redirect_page('home');
 		} else {

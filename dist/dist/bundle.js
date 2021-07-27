@@ -1,212 +1,11 @@
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// install a JSONP callback for chunk loading
-/******/ 	function webpackJsonpCallback(data) {
-/******/ 		var chunkIds = data[0];
-/******/ 		var moreModules = data[1];
-/******/
-/******/
-/******/ 		// add "moreModules" to the modules object,
-/******/ 		// then flag all "chunkIds" as loaded and fire callback
-/******/ 		var moduleId, chunkId, i = 0, resolves = [];
-/******/ 		for(;i < chunkIds.length; i++) {
-/******/ 			chunkId = chunkIds[i];
-/******/ 			if(Object.prototype.hasOwnProperty.call(installedChunks, chunkId) && installedChunks[chunkId]) {
-/******/ 				resolves.push(installedChunks[chunkId][0]);
-/******/ 			}
-/******/ 			installedChunks[chunkId] = 0;
-/******/ 		}
-/******/ 		for(moduleId in moreModules) {
-/******/ 			if(Object.prototype.hasOwnProperty.call(moreModules, moduleId)) {
-/******/ 				modules[moduleId] = moreModules[moduleId];
-/******/ 			}
-/******/ 		}
-/******/ 		if(parentJsonpFunction) parentJsonpFunction(data);
-/******/
-/******/ 		while(resolves.length) {
-/******/ 			resolves.shift()();
-/******/ 		}
-/******/
-/******/ 	};
-/******/
-/******/
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// object to store loaded and loading chunks
-/******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
-/******/ 	// Promise = chunk loading, 0 = chunk loaded
-/******/ 	var installedChunks = {
-/******/ 		"main": 0
-/******/ 	};
-/******/
-/******/
-/******/
-/******/ 	// script path function
-/******/ 	function jsonpScriptSrc(chunkId) {
-/******/ 		return __webpack_require__.p + "./dist/" + chunkId + ".bundle.js"
-/******/ 	}
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/ 	// This file contains only the entry chunk.
-/******/ 	// The chunk loading function for additional chunks
-/******/ 	__webpack_require__.e = function requireEnsure(chunkId) {
-/******/ 		var promises = [];
-/******/
-/******/
-/******/ 		// JSONP chunk loading for javascript
-/******/
-/******/ 		var installedChunkData = installedChunks[chunkId];
-/******/ 		if(installedChunkData !== 0) { // 0 means "already installed".
-/******/
-/******/ 			// a Promise means "currently loading".
-/******/ 			if(installedChunkData) {
-/******/ 				promises.push(installedChunkData[2]);
-/******/ 			} else {
-/******/ 				// setup Promise in chunk cache
-/******/ 				var promise = new Promise(function(resolve, reject) {
-/******/ 					installedChunkData = installedChunks[chunkId] = [resolve, reject];
-/******/ 				});
-/******/ 				promises.push(installedChunkData[2] = promise);
-/******/
-/******/ 				// start chunk loading
-/******/ 				var script = document.createElement('script');
-/******/ 				var onScriptComplete;
-/******/
-/******/ 				script.charset = 'utf-8';
-/******/ 				script.timeout = 120;
-/******/ 				if (__webpack_require__.nc) {
-/******/ 					script.setAttribute("nonce", __webpack_require__.nc);
-/******/ 				}
-/******/ 				script.src = jsonpScriptSrc(chunkId);
-/******/
-/******/ 				// create error before stack unwound to get useful stacktrace later
-/******/ 				var error = new Error();
-/******/ 				onScriptComplete = function (event) {
-/******/ 					// avoid mem leaks in IE.
-/******/ 					script.onerror = script.onload = null;
-/******/ 					clearTimeout(timeout);
-/******/ 					var chunk = installedChunks[chunkId];
-/******/ 					if(chunk !== 0) {
-/******/ 						if(chunk) {
-/******/ 							var errorType = event && (event.type === 'load' ? 'missing' : event.type);
-/******/ 							var realSrc = event && event.target && event.target.src;
-/******/ 							error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
-/******/ 							error.name = 'ChunkLoadError';
-/******/ 							error.type = errorType;
-/******/ 							error.request = realSrc;
-/******/ 							chunk[1](error);
-/******/ 						}
-/******/ 						installedChunks[chunkId] = undefined;
-/******/ 					}
-/******/ 				};
-/******/ 				var timeout = setTimeout(function(){
-/******/ 					onScriptComplete({ type: 'timeout', target: script });
-/******/ 				}, 120000);
-/******/ 				script.onerror = script.onload = onScriptComplete;
-/******/ 				document.head.appendChild(script);
-/******/ 			}
-/******/ 		}
-/******/ 		return Promise.all(promises);
-/******/ 	};
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "./dist/";
-/******/
-/******/ 	// on error function for async loading
-/******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
-/******/
-/******/ 	var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
-/******/ 	var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
-/******/ 	jsonpArray.push = webpackJsonpCallback;
-/******/ 	jsonpArray = jsonpArray.slice();
-/******/ 	for(var i = 0; i < jsonpArray.length; i++) webpackJsonpCallback(jsonpArray[i]);
-/******/ 	var parentJsonpFunction = oldJsonpFunction;
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/static/js/scripts/app.tsx");
-/******/ })
-/************************************************************************/
-/******/ ({
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/object-assign/index.js":
 /*!*********************************************!*\
   !*** ./node_modules/object-assign/index.js ***!
   \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((module) => {
 
 "use strict";
 /*
@@ -307,8 +106,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 /*!*************************************************************!*\
   !*** ./node_modules/react-dom/cjs/react-dom.development.js ***!
   \*************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 /** @license React v17.0.1
@@ -26576,8 +26374,7 @@ exports.version = ReactVersion;
 /*!*****************************************!*\
   !*** ./node_modules/react-dom/index.js ***!
   \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
@@ -26621,8 +26418,7 @@ if (false) {} else {
 /*!*****************************************************!*\
   !*** ./node_modules/react/cjs/react.development.js ***!
   \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 /** @license React v17.0.1
@@ -28966,8 +28762,7 @@ exports.version = ReactVersion;
 /*!*************************************!*\
   !*** ./node_modules/react/index.js ***!
   \*************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
@@ -28983,8 +28778,7 @@ if (false) {} else {
 /*!*********************************************************************!*\
   !*** ./node_modules/scheduler/cjs/scheduler-tracing.development.js ***!
   \*********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 /** @license React v0.20.1
@@ -29342,8 +29136,7 @@ exports.unstable_wrap = unstable_wrap;
 /*!*************************************************************!*\
   !*** ./node_modules/scheduler/cjs/scheduler.development.js ***!
   \*************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 /** @license React v0.20.1
@@ -30198,8 +29991,7 @@ exports.unstable_wrapCallback = unstable_wrapCallback;
 /*!*****************************************!*\
   !*** ./node_modules/scheduler/index.js ***!
   \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
@@ -30215,8 +30007,7 @@ if (false) {} else {
 /*!*******************************************!*\
   !*** ./node_modules/scheduler/tracing.js ***!
   \*******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
@@ -30228,33 +30019,111 @@ if (false) {} else {
 
 /***/ }),
 
-/***/ "./src/static/js/scripts/app.tsx":
-/*!***************************************!*\
-  !*** ./src/static/js/scripts/app.tsx ***!
-  \***************************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ "./src/static/js/scripts/api-utility/base-http.tsx":
+/*!*********************************************************!*\
+  !*** ./src/static/js/scripts/api-utility/base-http.tsx ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _led_button__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./led_button */ "./src/static/js/scripts/led_button.tsx");
-/* harmony import */ var _widget_system_widget_react_components_WidgetSystem__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./widget-system/widget-react-components/WidgetSystem */ "./src/static/js/scripts/widget-system/widget-react-components/WidgetSystem.tsx");
-
-
-
-
-class App extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
-    render() {
-        return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "app" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_widget_system_widget_react_components_WidgetSystem__WEBPACK_IMPORTED_MODULE_3__["WidgetSystem"], null)));
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// Stolen from: https://www.geeksforgeeks.org/simple-get-and-post-request-using-fetch-api-method-by-making-custom-http-library/?ref=rp
+class BaseHTTP {
+    constructor(u) {
+        this.url = u || window.location.host;
+    }
+    // Make an HTTP GET Request 
+    async get(url) {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        const resData = await response.json();
+        return resData;
+    }
+    // Make an HTTP POST Request
+    async post(data, url) {
+        url = url || this.url;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const resData = await response;
+        return resData;
+    }
+    // Make an HTTP PUT Request
+    async put(data, url) {
+        url = url || this.url;
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const resData = await response.json();
+        return resData;
     }
 }
-Object(react_dom__WEBPACK_IMPORTED_MODULE_1__["render"])(react__WEBPACK_IMPORTED_MODULE_0__["createElement"](App, null), document.getElementById("content"));
-Object(react_dom__WEBPACK_IMPORTED_MODULE_1__["render"])(react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_led_button__WEBPACK_IMPORTED_MODULE_2__["LEDButton"], null), document.getElementById("led_button_container"));
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BaseHTTP);
+
+
+/***/ }),
+
+/***/ "./src/static/js/scripts/api-utility/widget-http.tsx":
+/*!***********************************************************!*\
+  !*** ./src/static/js/scripts/api-utility/widget-http.tsx ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _api_utility_base_http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api-utility/base-http */ "./src/static/js/scripts/api-utility/base-http.tsx");
+
+class WidgetHTTP extends _api_utility_base_http__WEBPACK_IMPORTED_MODULE_0__.default {
+    constructor() {
+        super();
+    }
+    createWidget(type, route, label) {
+        //var url = "http://".concat(this.url, "/api/widgets/"); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
+        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets");
+        const data = { 'widget_type': type, 'route': route, 'label': label };
+        var response = this.post(data, url);
+        return response;
+    }
+    updateWidgetData() { }
+    updateWidgetDefaults() { }
+    getAllWidgets() {
+        //var url = "http://".concat(this.url, "/api/widgets/"); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
+        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets");
+        var widgets = this.get(url);
+        return widgets;
+    }
+    getWidget(id) {
+        //var url = "http://".concat(this.url, "/api/widgets/", String(id)); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
+        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets/", String(id));
+        var widget = this.get(url);
+        return widget;
+    }
+    getWidgetData(id) {
+        //var url = "http://".concat(this.url, "/api/widgets/", String(id), "/*"); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
+        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets/", String(id), "/*");
+        var data = this.get(url);
+        return data;
+    }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (WidgetHTTP);
 
 
 /***/ }),
@@ -30263,16 +30132,16 @@ Object(react_dom__WEBPACK_IMPORTED_MODULE_1__["render"])(react__WEBPACK_IMPORTED
 /*!**********************************************!*\
   !*** ./src/static/js/scripts/led_button.tsx ***!
   \**********************************************/
-/*! exports provided: LEDButton */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LEDButton", function() { return LEDButton; });
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LEDButton": () => (/* binding */ LEDButton)
+/* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 
-const e = react__WEBPACK_IMPORTED_MODULE_0__["createElement"];
+const e = react__WEBPACK_IMPORTED_MODULE_0__.createElement;
 const OnOffButtons = [
     {
         name: 'On',
@@ -30283,12 +30152,12 @@ const OnOffButtons = [
         value: '0'
     }
 ];
-class LEDButton extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
+class LEDButton extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     constructor(props) {
         super(props);
     }
     _renderOnOffButtons() {
-        return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null, OnOffButtons.map(function (button, indx) {
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, OnOffButtons.map(function (button, indx) {
             return e('button', { onClick: () => transmit("switch", button.value) }, button.name);
         })));
     }
@@ -30304,22 +30173,26 @@ class LEDButton extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
 /*!**************************************************************************************!*\
   !*** ./src/static/js/scripts/widget-system/widget-react-components/WidgetSystem.tsx ***!
   \**************************************************************************************/
-/*! exports provided: WidgetSystem */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WidgetSystem", function() { return WidgetSystem; });
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "WidgetSystem": () => (/* binding */ WidgetSystem)
+/* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _static_components_ErrorBoundary__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./static-components/ErrorBoundary */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/ErrorBoundary.tsx");
-/* harmony import */ var _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../widget-structures/widget-structure */ "./src/static/js/scripts/widget-system/widget-structures/widget-structure.tsx");
+/* harmony import */ var _static_components_AddWidget__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./static-components/AddWidget */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/AddWidget.tsx");
+/* harmony import */ var _static_components_Alerts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./static-components/Alerts */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/Alerts.tsx");
+/* harmony import */ var _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../widget-structures/widget-structure */ "./src/static/js/scripts/widget-system/widget-structures/widget-structure.tsx");
+
+
 
 
 
 //Subsystems
 
-class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
+class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     constructor(props) {
         super(props);
         this.handleSettingsClick = struct => event => {
@@ -30327,21 +30200,23 @@ class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
             console.log(struct.getPair("type"));
             event.preventDefault();
         };
-        // TEST CODE: DATABASE WILL PROVIDE THIS EVENTUALLY
         var widgetstruct = [];
-        widgetstruct.push(new _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_2__["NewWidgetStructure"]("OnOff", "Label1", "route"));
-        widgetstruct.push(new _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_2__["NewWidgetStructure"]("TestLabel", "Label2", "route"));
-        widgetstruct.push(new _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_2__["NewWidgetStructure"]("TestForm", "Label1", "route"));
-        widgetstruct.push(new _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_2__["NewWidgetStructure"]("TestLabel", "Label3", "route"));
-        widgetstruct.push(new _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_2__["NewWidgetStructure"]("TestSelfLabel", "Label4", "route"));
-        widgetstruct.push(new _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_2__["NewWidgetStructure"]("TestSelfLabel", "Label5", "route"));
-        // TEST CODE : END
+        var widgets = _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_4__.requestWidgets();
+        var self = this;
+        widgets.then(widgets => {
+            widgets.forEach(function (widget) {
+                widgetstruct.push(widget);
+            });
+            self.refresh();
+        });
         this.state = {
             DynamicWidgetComponents: widgetstruct
         };
         this.handleSettingsClick = this.handleSettingsClick.bind(this);
         this.getDynamicComponents = this.getDynamicComponents.bind(this);
         this.updateDynamicComponents = this.updateDynamicComponents.bind(this);
+        this.refresh = this.refresh.bind(this);
+        this.refreshWithRequest = this.refreshWithRequest.bind(this);
     }
     // Returns the current set of Widgets
     getDynamicComponents() {
@@ -30351,94 +30226,282 @@ class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     // Upon calling this function, will redraw entire Widget System
     // the redraw will use the array of the new widgets
     // Best Practice: use getDynamicComponents and update that array.
+    // WARNING: Using this will cause ALL components to lose their state.
     updateDynamicComponents(widgetstruct) {
         this.setState((state) => ({
             DynamicWidgetComponents: widgetstruct
         }));
     }
+    // So this a goober function. It will basically just ask the server for the Widgets. Should center the app when it goes wack
+    refreshWithRequest() {
+        var widgetstruct = [];
+        var widgets = _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_4__.requestWidgets();
+        var self = this;
+        widgets.then(widgets => {
+            widgets.forEach(function (widget) {
+                widgetstruct.push(widget);
+            });
+            self.updateDynamicComponents(widgetstruct);
+        });
+    }
+    refresh() {
+        this.updateDynamicComponents(this.getDynamicComponents());
+    }
     render() {
-        return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "widget-system" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "grid-container" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](react__WEBPACK_IMPORTED_MODULE_0__["Suspense"], { fallback: "" },
-                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_static_components_ErrorBoundary__WEBPACK_IMPORTED_MODULE_1__["default"], null, this.state.DynamicWidgetComponents.map((struct) => {
-                        const DynamicComponent = react__WEBPACK_IMPORTED_MODULE_0__["lazy"](() => __webpack_require__("./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy recursive ^\\.\\/Widget.*$")("./Widget" + struct.getPair("type")));
-                        return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "card border-light mb-5" },
-                            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "card-title text-right" },
-                                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "btn", onClick: this.handleSettingsClick(struct) },
-                                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", fill: "currentColor", className: "bi bi-gear", viewBox: "0 0 16 16" },
-                                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("path", { d: "M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" }),
-                                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("path", { d: "M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" })))),
-                            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "card-body" },
-                                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](DynamicComponent, { structure: struct, updateDynamicComponents: this.updateDynamicComponents, getDynamicComponents: this.getDynamicComponents })),
-                            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "card-footer text-center" },
-                                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("h5", null, struct.getPair("label")))));
-                    }))))));
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "widget-system" },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_static_components_Alerts__WEBPACK_IMPORTED_MODULE_3__.default, null),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-deck justify-content-center" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Suspense, { fallback: "" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_static_components_ErrorBoundary__WEBPACK_IMPORTED_MODULE_1__.default, null,
+                        this.state.DynamicWidgetComponents.map((struct) => {
+                            const DynamicComponent = react__WEBPACK_IMPORTED_MODULE_0__.lazy(() => __webpack_require__("./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy recursive ^\\.\\/Widget.*$")("./Widget" + struct.getPair("type")));
+                            return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { key: struct.getPair("dbID") },
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card border-light mb-5" },
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-title text-right" },
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { className: "btn", onClick: this.handleSettingsClick(struct) },
+                                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", fill: "currentColor", className: "bi bi-gear", viewBox: "0 0 16 16" },
+                                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" }),
+                                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" })))),
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-body" },
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(DynamicComponent, { structure: struct, updateDynamicComponents: this.updateDynamicComponents, getDynamicComponents: this.getDynamicComponents })),
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-footer text-center" },
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, struct.getPair("label"))))));
+                        }),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_static_components_AddWidget__WEBPACK_IMPORTED_MODULE_2__.default, { updateDynamicComponents: this.updateDynamicComponents, getDynamicComponents: this.getDynamicComponents, refresh: this.refresh, refreshWithRequest: this.refreshWithRequest }))))));
     }
 }
 
 
 /***/ }),
 
-/***/ "./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy recursive ^\\.\\/Widget.*$":
-/*!*****************************************************************************************************************************!*\
-  !*** ./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy ^\.\/Widget.*$ namespace object ***!
-  \*****************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ "./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/registry.tsx":
+/*!*****************************************************************************************************!*\
+  !*** ./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/registry.tsx ***!
+  \*****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-var map = {
-	"./WidgetOnOff": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetOnOff.tsx",
-		0
-	],
-	"./WidgetOnOff.tsx": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetOnOff.tsx",
-		0
-	],
-	"./WidgetTestForm": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestForm.tsx",
-		1
-	],
-	"./WidgetTestForm.tsx": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestForm.tsx",
-		1
-	],
-	"./WidgetTestLabel": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestLabel.tsx",
-		2
-	],
-	"./WidgetTestLabel.tsx": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestLabel.tsx",
-		2
-	],
-	"./WidgetTestSelfLabel": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestSelfLabel.tsx",
-		3
-	],
-	"./WidgetTestSelfLabel.tsx": [
-		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestSelfLabel.tsx",
-		3
-	]
-};
-function webpackAsyncContext(req) {
-	if(!__webpack_require__.o(map, req)) {
-		return Promise.resolve().then(function() {
-			var e = new Error("Cannot find module '" + req + "'");
-			e.code = 'MODULE_NOT_FOUND';
-			throw e;
-		});
-	}
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "availableWidgets": () => (/* binding */ availableWidgets)
+/* harmony export */ });
+// Completed Widgets must be added to this in order to be integrated in the system
+var availableWidgets = [
+    "OnOff",
+    "TestForm",
+    "TestLabel",
+    "TestSelfLabel"
+];
 
-	var ids = map[req], id = ids[0];
-	return __webpack_require__.e(ids[1]).then(function() {
-		return __webpack_require__(id);
-	});
+
+/***/ }),
+
+/***/ "./src/static/js/scripts/widget-system/widget-react-components/static-components/AddWidget.tsx":
+/*!*****************************************************************************************************!*\
+  !*** ./src/static/js/scripts/widget-system/widget-react-components/static-components/AddWidget.tsx ***!
+  \*****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _dynamic_components_registry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dynamic-components/registry */ "./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/registry.tsx");
+/* harmony import */ var _Alerts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Alerts */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/Alerts.tsx");
+/* harmony import */ var _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../api-utility/widget-http */ "./src/static/js/scripts/api-utility/widget-http.tsx");
+
+
+
+
+class AddWidget extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
+    constructor(props) {
+        super(props);
+        this.handleAdd = this.handleAdd.bind(this);
+    }
+    handleAdd(e) {
+        const type = document.getElementById("createType").value;
+        const route = document.getElementById("createRoute").value;
+        const label = document.getElementById("createLabel").value;
+        if (!type || type.length === 0 || !route || route.length === 0) {
+            _Alerts__WEBPACK_IMPORTED_MODULE_2__.AlertQueue.queueAlert("DANGER", "Failed to create Widget. Empty Fields");
+            this.props.refresh();
+            return;
+        }
+        var widget_http = new _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_3__.default();
+        var response = widget_http.createWidget(type, route, label);
+        var self = this;
+        response.then(response => {
+            if (response.status <= 300) {
+                self.props.refreshWithRequest();
+            }
+            else {
+                _Alerts__WEBPACK_IMPORTED_MODULE_2__.AlertQueue.queueAlert("DANGER", "Failed to create Widget. Status Code: " + response.status + " " + response.statusText);
+            }
+        });
+        e.preventDefault();
+    }
+    render() {
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null,
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal fade", id: "AddWidgetModal", role: "dialog", "aria-labelledby": "AddWidgetLabel", "aria-hidden": "true" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-dialog", role: "document" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-content" },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-header" },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", { className: "modal-title", id: "AddWidgetLabel" }, "Add New Widget"),
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close" },
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { "aria-hidden": "true" }, "\u00D7"))),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-body" },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null,
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Type"),
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("select", { id: "createType", className: "form-control" }, _dynamic_components_registry__WEBPACK_IMPORTED_MODULE_1__.availableWidgets.map((widget_name) => {
+                                        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", { key: Math.floor(Math.random() * 200) + 1 }, widget_name));
+                                    }))),
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Route"),
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", { type: "text", className: "form-control", id: "createRoute", "aria-describedby": "emailHelp", placeholder: "Enter Route" })),
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Label"),
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", { type: "text", className: "form-control", id: "createLabel", placeholder: "Enter Label" })))),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-footer" },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "btn btn-secondary", "data-dismiss": "modal" }, "Close"),
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "btn btn-success", onClick: this.handleAdd, "data-dismiss": "modal" }, "Create Widget"))))),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card border-0" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-body" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "btn btn-success btn-circle btn-xl", "data-toggle": "modal", "data-target": "#AddWidgetModal" },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "7rem", height: "7rem", fill: "currentColor", className: "bi bi-plus", viewBox: "0 0 16 16" },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" })))))));
+    }
 }
-webpackAsyncContext.keys = function webpackAsyncContextKeys() {
-	return Object.keys(map);
-};
-webpackAsyncContext.id = "./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy recursive ^\\.\\/Widget.*$";
-module.exports = webpackAsyncContext;
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AddWidget);
+
+
+/***/ }),
+
+/***/ "./src/static/js/scripts/widget-system/widget-react-components/static-components/Alerts.tsx":
+/*!**************************************************************************************************!*\
+  !*** ./src/static/js/scripts/widget-system/widget-react-components/static-components/Alerts.tsx ***!
+  \**************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AlertQueue": () => (/* binding */ AlertQueue),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+var AlertType;
+(function (AlertType) {
+    AlertType["DANGER"] = "DANGER";
+    AlertType["PRIMARY"] = "PRIMARY";
+    AlertType["SUCCESS"] = "SUCCESS";
+    AlertType["WARNING"] = "WARNING";
+})(AlertType || (AlertType = {}));
+class Alert {
+    constructor(t, m) {
+        this.type = t;
+        this.message = m;
+    }
+    render() {
+        switch (this.type) {
+            case AlertType.DANGER: {
+                return this.renderDanger();
+                break;
+            }
+            case AlertType.PRIMARY: {
+                return this.renderPrimary();
+                break;
+            }
+            case AlertType.SUCCESS: {
+                return this.renderSuccess();
+                break;
+            }
+            case AlertType.WARNING: {
+                return this.renderWarning();
+                break;
+            }
+            default: {
+                return this.renderDanger();
+                break;
+            }
+        }
+    }
+    renderDanger() {
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "alert alert-danger shadow", role: "alert", style: { borderLeft: "5px solid #721C24", borderRadius: "0px" } },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "close", "data-dismiss": "alert", "aria-label": "Close" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { "aria-hidden": "true", style: { color: "#721C24" } }, "\u00D7")),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "row" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { width: "1.25em", height: "1.25em", viewBox: "0 0 16 16", className: "m-1 bi bi-exclamation-circle-fill", fill: "currentColor", xmlns: "http://www.w3.org/2000/svg" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { fillRule: "evenodd", d: "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" })),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", { style: { fontSize: "18px" }, className: "mb-0 font-weight-light" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("b", { className: "mr-1" }, "Danger!"),
+                    this.message))));
+    }
+    renderPrimary() {
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "alert alert-primary shadow", role: "alert", style: { borderLeft: "#155724 5px solid", borderRadius: "0px" } },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "close", "data-dismiss": "alert", "aria-label": "Close" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { "aria-hidden": "true", style: { color: "#155724" } }, "\u00D7")),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "row" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { width: "1.25em", height: "1.25em", viewBox: "0 0 16 16", className: "m-1 bi bi-bell-fill", fill: "currentColor", xmlns: "http://www.w3.org/2000/svg" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z" })),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", { style: { fontSize: "18px" }, className: "mb-0 font-weight-light" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("b", { className: "mr-1" }, "Alert:"),
+                    this.message))));
+    }
+    renderSuccess() {
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "alert alert-success shadow", role: "alert", style: { borderLeft: "#155724 5px solid", borderRadius: "0px" } },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "close", "data-dismiss": "alert", "aria-label": "Close" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { "aria-hidden": "true", style: { color: "#155724" } }, "\u00D7")),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "row" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { width: "1.25em", height: "1.25em", viewBox: "0 0 16 16", className: "m-1 bi bi-shield-fill-check", fill: "currentColor", xmlns: "http://www.w3.org/2000/svg" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { fillRule: "evenodd", d: "M8 .5c-.662 0-1.77.249-2.813.525a61.11 61.11 0 0 0-2.772.815 1.454 1.454 0 0 0-1.003 1.184c-.573 4.197.756 7.307 2.368 9.365a11.192 11.192 0 0 0 2.417 2.3c.371.256.715.451 1.007.586.27.124.558.225.796.225s.527-.101.796-.225c.292-.135.636-.33 1.007-.586a11.191 11.191 0 0 0 2.418-2.3c1.611-2.058 2.94-5.168 2.367-9.365a1.454 1.454 0 0 0-1.003-1.184 61.09 61.09 0 0 0-2.772-.815C9.77.749 8.663.5 8 .5zm2.854 6.354a.5.5 0 0 0-.708-.708L7.5 8.793 6.354 7.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z" })),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", { style: { fontSize: "18px" }, className: "mb-0 font-weight-light" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("b", { className: "mr-1" }, "Success!"),
+                    this.message))));
+    }
+    renderWarning() {
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "alert alert-warning shadow", role: "alert", style: { borderLeft: "#856404 5px solid", borderRadius: "0px" } },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "close", "data-dismiss": "alert", "aria-label": "Close" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { "aria-hidden": "true", style: { color: "#856404" } }, "\u00D7")),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "row" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { width: "1.25em", height: "1.25em", viewBox: "0 0 16 16", className: "m-1 bi bi-cone-striped", fill: "currentColor", xmlns: "http://www.w3.org/2000/svg" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M9.97 4.88l.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.158-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12zm-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098zm4.396 8.613a.5.5 0 0 1 .037.96l-6 2a.5.5 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l2.391-.598.565-2.257c.862.212 1.964.339 3.165.339s2.303-.127 3.165-.339l.565 2.257 2.391.598z" })),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", { style: { fontSize: "18px" }, className: "mb-0 font-weight-light" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("b", { className: "mr-1" }, "Warning:"),
+                    this.message))));
+    }
+}
+class AlertQueue {
+    static queueAlert(t, m) {
+        var alert = new Alert(AlertType[t], m);
+        AlertQueue.alerts.push(alert);
+    }
+    static runAlert() {
+        var key = AlertQueue.renderedAlerts;
+        var a = AlertQueue.alerts.pop() || new Alert(AlertType.DANGER, "Failure to load Alert");
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "alert: " + key, key: key }, a.render()));
+    }
+}
+AlertQueue.alerts = [];
+AlertQueue.renderedAlerts = 0;
+class Alerts extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        var alerts = [];
+        while (AlertQueue.alerts.length > 0) {
+            alerts.push(AlertQueue.runAlert());
+            AlertQueue.renderedAlerts++;
+        }
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "container" }, alerts));
+    }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Alerts);
+
 
 /***/ }),
 
@@ -30446,15 +30509,16 @@ module.exports = webpackAsyncContext;
 /*!*********************************************************************************************************!*\
   !*** ./src/static/js/scripts/widget-system/widget-react-components/static-components/ErrorBoundary.tsx ***!
   \*********************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 
-class ErrorBoundary extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
+class ErrorBoundary extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     constructor(props) {
         super(props);
         this.state = { hasError: false };
@@ -30470,12 +30534,12 @@ class ErrorBoundary extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     render() {
         if (this.state.hasError) {
             // You can render any custom fallback UI
-            return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("p", null, "Oops! Something went terribly wrong!!");
+            return react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Oops! Something went terribly wrong!!");
         }
         return this.props.children;
     }
 }
-/* harmony default export */ __webpack_exports__["default"] = (ErrorBoundary);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ErrorBoundary);
 
 
 /***/ }),
@@ -30484,14 +30548,25 @@ class ErrorBoundary extends react__WEBPACK_IMPORTED_MODULE_0__["Component"] {
 /*!************************************************************************************!*\
   !*** ./src/static/js/scripts/widget-system/widget-structures/widget-structure.tsx ***!
   \************************************************************************************/
-/*! exports provided: NewWidgetStructure, ExistingWidgetStructure, requestTotalWidgets */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NewWidgetStructure", function() { return NewWidgetStructure; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ExistingWidgetStructure", function() { return ExistingWidgetStructure; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "requestTotalWidgets", function() { return requestTotalWidgets; });
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "NewWidgetStructure": () => (/* binding */ NewWidgetStructure),
+/* harmony export */   "ExistingWidgetStructure": () => (/* binding */ ExistingWidgetStructure),
+/* harmony export */   "requestWidgets": () => (/* binding */ requestWidgets)
+/* harmony export */ });
+/* harmony import */ var _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../api-utility/widget-http */ "./src/static/js/scripts/api-utility/widget-http.tsx");
+/*
+
+6/5/2021
+
+Description: The whole point of this WidgetStructure System is to sit ontop of the existing React Components and act as
+the layer liason between the server (database and persistence) and what the user sees.
+
+*/
+
 /*
 This class acts the wrapper for the data that the widget will hold.
 It will control the data flow
@@ -30538,12 +30613,26 @@ class WidgetStructureBase {
     //MUST BE AN DEFAULT KEY
     initalPair(key, value) {
         if (this.isDefaultKey(key)) {
+            // TODO: Seperate this from existingPair() by adding requirements for the various defaults
             this.widgetCustomData.setPair(key, value);
         }
         else {
             throw new Error("WidgetStructureBase Error: Not a default key.");
         }
     }
+    //Used for when loading the existing pairs
+    existingPair(key, value) {
+        if (!this.isDefaultKey(key)) {
+            this.widgetCustomData.setPair(key, value);
+        }
+        else {
+            throw new Error("WidgetStructureBase Error: Is a default key, use initalPair");
+        }
+    }
+    // Purpose: Real-time communication to database
+    // Should be used when a specific widget wants to save a piece of information about itself
+    // example: type or route, or ANY piece of data that needs to be saved and cannot be retrived
+    // via a request to the route
     updatePair(key, value) {
         if (!this.isFinalKey(key)) {
             //SENDS REQUEST TO DATABASE FOR AN UPDATE
@@ -30559,7 +30648,7 @@ class WidgetStructureBase {
 }
 WidgetStructureBase.totalWidgets = 0;
 WidgetStructureBase.defaultKeys = ["type", "label", "route", "dbID"]; // Default keys
-WidgetStructureBase.finalKeys = ["dbID", "type"]; // Once itialized, these keys cannot be created
+WidgetStructureBase.finalKeys = ["dbID", "type"]; // Once itialized, these keys cannot be changed. You gotta delete the widget
 class NewWidgetStructure extends WidgetStructureBase {
     constructor(type, label, route) {
         super();
@@ -30571,25 +30660,362 @@ class NewWidgetStructure extends WidgetStructureBase {
     }
 }
 class ExistingWidgetStructure extends WidgetStructureBase {
-    constructor(dbID) {
+    constructor(dbID, type, label, route) {
         super();
-        this.initalPair("dBID", dbID);
-        // TODO: Request data using loadData and the dbID
-        // TODO: Load that data into the CustomData using initalPair
+        this.initalPair("dbID", dbID);
+        this.initalPair("type", type);
+        this.initalPair("label", label);
+        this.initalPair("route", route);
+        this.loadData();
     }
     loadData() {
         var dbID = this.getPair("dbID");
-        // TODO: REQUEST TO THE SERVER PREVIOUS DATA USING dBID
-        // SHOULD RETURN DICTIONARY WITH INFO
+        var widgetHTTP = new _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_0__.default();
+        var self = this;
+        widgetHTTP.getWidgetData(dbID).then(data => {
+            if (!(data === null)) {
+                data.forEach(function (pair) {
+                    var key = pair['widget_key'];
+                    var value = pair['widget_value'];
+                    self.existingPair(key, value);
+                });
+            }
+        });
     }
 }
-function requestTotalWidgets() {
+// Provides an array of all the existing widgets that the user has
+function requestWidgets() {
     //TODO : Use requestor to ask for all the widgets
-    return 0;
+    var widgetHTTP = new _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_0__.default();
+    var result = widgetHTTP.getAllWidgets().then(widgets => {
+        if (!widgets.length) {
+            // TODO Add Failure Message
+            console.log("Failed to get Widgets");
+        }
+        var result = [];
+        widgets.forEach(function (widget) {
+            const id = widget['widget_id'];
+            const type = widget['widget_type'];
+            const label = widget['label'];
+            const route = widget['route'];
+            var w = new ExistingWidgetStructure(id, type, label, route);
+            result.push(w);
+        });
+        return result;
+    });
+    return result;
 }
 
+
+/***/ }),
+
+/***/ "./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy recursive ^\\.\\/Widget.*$":
+/*!******************************************************************************************************************************!*\
+  !*** ./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/ lazy ^\.\/Widget.*$ namespace object ***!
+  \******************************************************************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var map = {
+	"./WidgetOnOff": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetOnOff.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetOnOff_tsx"
+	],
+	"./WidgetOnOff.tsx": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetOnOff.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetOnOff_tsx"
+	],
+	"./WidgetTestForm": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestForm.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetTestForm_tsx"
+	],
+	"./WidgetTestForm.tsx": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestForm.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetTestForm_tsx"
+	],
+	"./WidgetTestLabel": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestLabel.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetTestLabel_tsx"
+	],
+	"./WidgetTestLabel.tsx": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestLabel.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetTestLabel_tsx"
+	],
+	"./WidgetTestSelfLabel": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestSelfLabel.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetTestSelf-79075a"
+	],
+	"./WidgetTestSelfLabel.tsx": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetTestSelfLabel.tsx",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetTestSelf-79075a"
+	]
+};
+function webpackAsyncContext(req) {
+	if(!__webpack_require__.o(map, req)) {
+		return Promise.resolve().then(() => {
+			var e = new Error("Cannot find module '" + req + "'");
+			e.code = 'MODULE_NOT_FOUND';
+			throw e;
+		});
+	}
+
+	var ids = map[req], id = ids[0];
+	return __webpack_require__.e(ids[1]).then(() => {
+		return __webpack_require__(id);
+	});
+}
+webpackAsyncContext.keys = () => (Object.keys(map));
+webpackAsyncContext.id = "./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy recursive ^\\.\\/Widget.*$";
+module.exports = webpackAsyncContext;
 
 /***/ })
 
-/******/ });
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = __webpack_modules__;
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/ensure chunk */
+/******/ 	(() => {
+/******/ 		__webpack_require__.f = {};
+/******/ 		// This file contains only the entry chunk.
+/******/ 		// The chunk loading function for additional chunks
+/******/ 		__webpack_require__.e = (chunkId) => {
+/******/ 			return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
+/******/ 				__webpack_require__.f[key](chunkId, promises);
+/******/ 				return promises;
+/******/ 			}, []));
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/get javascript chunk filename */
+/******/ 	(() => {
+/******/ 		// This function allow to reference async chunks
+/******/ 		__webpack_require__.u = (chunkId) => {
+/******/ 			// return url for filenames based on template
+/******/ 			return "./dist/" + chunkId + ".bundle.js";
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/load script */
+/******/ 	(() => {
+/******/ 		var inProgress = {};
+/******/ 		var dataWebpackPrefix = "AAC:";
+/******/ 		// loadScript function to load a script via script tag
+/******/ 		__webpack_require__.l = (url, done, key, chunkId) => {
+/******/ 			if(inProgress[url]) { inProgress[url].push(done); return; }
+/******/ 			var script, needAttach;
+/******/ 			if(key !== undefined) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				for(var i = 0; i < scripts.length; i++) {
+/******/ 					var s = scripts[i];
+/******/ 					if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
+/******/ 				}
+/******/ 			}
+/******/ 			if(!script) {
+/******/ 				needAttach = true;
+/******/ 				script = document.createElement('script');
+/******/ 		
+/******/ 				script.charset = 'utf-8';
+/******/ 				script.timeout = 120;
+/******/ 				if (__webpack_require__.nc) {
+/******/ 					script.setAttribute("nonce", __webpack_require__.nc);
+/******/ 				}
+/******/ 				script.setAttribute("data-webpack", dataWebpackPrefix + key);
+/******/ 				script.src = url;
+/******/ 			}
+/******/ 			inProgress[url] = [done];
+/******/ 			var onScriptComplete = (prev, event) => {
+/******/ 				// avoid mem leaks in IE.
+/******/ 				script.onerror = script.onload = null;
+/******/ 				clearTimeout(timeout);
+/******/ 				var doneFns = inProgress[url];
+/******/ 				delete inProgress[url];
+/******/ 				script.parentNode && script.parentNode.removeChild(script);
+/******/ 				doneFns && doneFns.forEach((fn) => (fn(event)));
+/******/ 				if(prev) return prev(event);
+/******/ 			}
+/******/ 			;
+/******/ 			var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+/******/ 			script.onerror = onScriptComplete.bind(null, script.onerror);
+/******/ 			script.onload = onScriptComplete.bind(null, script.onload);
+/******/ 			needAttach && document.head.appendChild(script);
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/publicPath */
+/******/ 	(() => {
+/******/ 		__webpack_require__.p = "./dist/";
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/jsonp chunk loading */
+/******/ 	(() => {
+/******/ 		// no baseURI
+/******/ 		
+/******/ 		// object to store loaded and loading chunks
+/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 		var installedChunks = {
+/******/ 			"main": 0
+/******/ 		};
+/******/ 		
+/******/ 		__webpack_require__.f.j = (chunkId, promises) => {
+/******/ 				// JSONP chunk loading for javascript
+/******/ 				var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
+/******/ 				if(installedChunkData !== 0) { // 0 means "already installed".
+/******/ 		
+/******/ 					// a Promise means "currently loading".
+/******/ 					if(installedChunkData) {
+/******/ 						promises.push(installedChunkData[2]);
+/******/ 					} else {
+/******/ 						if(true) { // all chunks have JS
+/******/ 							// setup Promise in chunk cache
+/******/ 							var promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
+/******/ 							promises.push(installedChunkData[2] = promise);
+/******/ 		
+/******/ 							// start chunk loading
+/******/ 							var url = __webpack_require__.p + __webpack_require__.u(chunkId);
+/******/ 							// create error before stack unwound to get useful stacktrace later
+/******/ 							var error = new Error();
+/******/ 							var loadingEnded = (event) => {
+/******/ 								if(__webpack_require__.o(installedChunks, chunkId)) {
+/******/ 									installedChunkData = installedChunks[chunkId];
+/******/ 									if(installedChunkData !== 0) installedChunks[chunkId] = undefined;
+/******/ 									if(installedChunkData) {
+/******/ 										var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 										var realSrc = event && event.target && event.target.src;
+/******/ 										error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
+/******/ 										error.name = 'ChunkLoadError';
+/******/ 										error.type = errorType;
+/******/ 										error.request = realSrc;
+/******/ 										installedChunkData[1](error);
+/******/ 									}
+/******/ 								}
+/******/ 							};
+/******/ 							__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId);
+/******/ 						} else installedChunks[chunkId] = 0;
+/******/ 					}
+/******/ 				}
+/******/ 		};
+/******/ 		
+/******/ 		// no prefetching
+/******/ 		
+/******/ 		// no preloaded
+/******/ 		
+/******/ 		// no HMR
+/******/ 		
+/******/ 		// no HMR manifest
+/******/ 		
+/******/ 		// no on chunks loaded
+/******/ 		
+/******/ 		// install a JSONP callback for chunk loading
+/******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+/******/ 			var [chunkIds, moreModules, runtime] = data;
+/******/ 			// add "moreModules" to the modules object,
+/******/ 			// then flag all "chunkIds" as loaded and fire callback
+/******/ 			var moduleId, chunkId, i = 0;
+/******/ 			for(moduleId in moreModules) {
+/******/ 				if(__webpack_require__.o(moreModules, moduleId)) {
+/******/ 					__webpack_require__.m[moduleId] = moreModules[moduleId];
+/******/ 				}
+/******/ 			}
+/******/ 			if(runtime) var result = runtime(__webpack_require__);
+/******/ 			if(parentChunkLoadingFunction) parentChunkLoadingFunction(data);
+/******/ 			for(;i < chunkIds.length; i++) {
+/******/ 				chunkId = chunkIds[i];
+/******/ 				if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
+/******/ 					installedChunks[chunkId][0]();
+/******/ 				}
+/******/ 				installedChunks[chunkIds[i]] = 0;
+/******/ 			}
+/******/ 		
+/******/ 		}
+/******/ 		
+/******/ 		var chunkLoadingGlobal = self["webpackChunkAAC"] = self["webpackChunkAAC"] || [];
+/******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
+/******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+/*!***************************************!*\
+  !*** ./src/static/js/scripts/app.tsx ***!
+  \***************************************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var _led_button__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./led_button */ "./src/static/js/scripts/led_button.tsx");
+/* harmony import */ var _widget_system_widget_react_components_WidgetSystem__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./widget-system/widget-react-components/WidgetSystem */ "./src/static/js/scripts/widget-system/widget-react-components/WidgetSystem.tsx");
+
+
+
+
+class App extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
+    render() {
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "app" },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_widget_system_widget_react_components_WidgetSystem__WEBPACK_IMPORTED_MODULE_3__.WidgetSystem, null)));
+    }
+}
+(0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)(react__WEBPACK_IMPORTED_MODULE_0__.createElement(App, null), document.getElementById("content"));
+(0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)(react__WEBPACK_IMPORTED_MODULE_0__.createElement(_led_button__WEBPACK_IMPORTED_MODULE_2__.LEDButton, null), document.getElementById("led_button_container"));
+
+})();
+
+/******/ })()
+;
 //# sourceMappingURL=bundle.js.map

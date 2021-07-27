@@ -7,7 +7,10 @@
         "jsx": "react",             // use typescript to transpile jsx to js
         "target": "es2020",            // specify ECMAScript target version
         "allowJs": true,             // allow a partial TypeScript and JavaScript codebase
-        "lib": [ "dom", "es2017", "es2017.object", "es2016" ]
+        "lib": [ "dom", "es2017", "es2017.object", "es2016" ],
+        "types": [
+          "webpack-env"
+        ]
 
     },
     "include": [

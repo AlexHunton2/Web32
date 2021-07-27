@@ -31,5 +31,9 @@
 			$hashedPass = $this->select("users", "username", $username, PDO::FETCH_ASSOC)[0]['password'];
 			return password_verify($password, $hashedPass);
 		}
+
+		public function getUserIDFromUsername(string $username) {
+			return $this->select("users", "username", $username, PDO::FETCH_ASSOC)[0]['user_id'];
+		}
 	}
 ?>

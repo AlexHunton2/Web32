@@ -49,5 +49,16 @@
 			}
 
 		}
+
+		// Checks if a widget_id is associated with a user
+		public function isOwnedByUser(int $user_id, int $widget_id) {
+			$widgets_of_user = $this->getWidgetsFromUser($user_id);
+			foreach ($widgets_of_user as $i => $widget_info) {
+				if ($widget_info['widget_id'] == $widget_id) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 ?>

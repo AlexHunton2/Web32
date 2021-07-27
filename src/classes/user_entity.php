@@ -16,5 +16,9 @@
 		public function getUsername() {
 			return $this->username; 
 		}
+
+		public function getUserID() {
+			return $this->user_id;
+		}
 	}
 ?>

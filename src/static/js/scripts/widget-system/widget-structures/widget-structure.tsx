@@ -6,6 +6,7 @@ Description: The whole point of this WidgetStructure System is to sit ontop of t
 the layer liason between the server (database and persistence) and what the user sees. 
 
 */
+import WidgetHTTP from "../../api-utility/widget-http";
 
 
 export interface WidgetStructure {
@@ -81,9 +82,19 @@ abstract class WidgetStructureBase implements WidgetStructure {
 	//MUST BE AN DEFAULT KEY
 	protected initalPair(key : string, value : any) : void {
 		if (this.isDefaultKey(key)) {
+			// TODO: Seperate this from existingPair() by adding requirements for the various defaults
 			this.widgetCustomData.setPair(key, value);
 		} else {
 			throw new Error("WidgetStructureBase Error: Not a default key.");
+		}
+	}
+
+	//Used for when loading the existing pairs
+	protected existingPair(key : string, value : any) : void {
+		if (!this.isDefaultKey(key)) {
+			this.widgetCustomData.setPair(key, value);
+		} else {
+			throw new Error("WidgetStructureBase Error: Is a default key, use initalPair");
 		}
 	}
 
@@ -120,27 +131,55 @@ export class NewWidgetStructure extends WidgetStructureBase {
 
 
 export class ExistingWidgetStructure extends WidgetStructureBase {
-	constructor(dbID : number) {
+	constructor(dbID : number, type: string, label: string, route: string) {
 		super();
-		this.initalPair("dBID", dbID);
-		// TODO: Request data using loadData and the dbID
-
-		// TODO: Load that data into the CustomData using initalPair
-
-		// TODO: Add a "WidgetFailed" Widget, check if all defaultkeys have been filled
-		// if not, then throw a WidgetFailed Widget instead of the desired Widget.
-		// this.initiPair("type", "WidgetFailed")
+		this.initalPair("dbID", dbID);
+		this.initalPair("type", type);
+		this.initalPair("label", label);
+		this.initalPair("route", route);
+		this.loadData();
 	}
 
 	private loadData() {
 		var dbID = this.getPair("dbID");
-		// TODO: REQUEST TO THE SERVER PREVIOUS DATA USING dBID
 
-		// SHOULD RETURN DICTIONARY WITH INFO
+		var widgetHTTP = new WidgetHTTP();
+		var self = this;
+		widgetHTTP.getWidgetData(dbID).then(data => {
+			if (!(data === null)) {
+				data.forEach(function (pair) {
+					var key : string = pair['widget_key'];
+					var value = pair['widget_value'];
+					self.existingPair(key, value);
+				});
+			}
+		});
 	}
 }
 
-export function requestTotalWidgets() : number {
+
+// Provides an array of all the existing widgets that the user has
+export function requestWidgets() {
 	//TODO : Use requestor to ask for all the widgets
-	return 0;
+	
+
+	var widgetHTTP = new WidgetHTTP();
+	var result = widgetHTTP.getAllWidgets().then(widgets => {
+		if (!widgets.length) {
+			// TODO Add Failure Message
+			console.log("Failed to get Widgets");
+		}
+		var result:ExistingWidgetStructure[] = [];
+		widgets.forEach(function (widget) {
+			const id = widget['widget_id']; 
+			const type = widget['widget_type'];
+			const label = widget['label'];
+			const route = widget['route'];
+			var w = new ExistingWidgetStructure(id, type, label, route);
+
+			result.push(w);
+		});
+		return result;
+	});
+	return result;
 }

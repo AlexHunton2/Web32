@@ -16,7 +16,7 @@
               } 
             ?>
             <a href="logout" class="btn btn-light" type="submit">Logout</a>
-          </nav>
+          </form>
         </div>
       </div>
 </header>

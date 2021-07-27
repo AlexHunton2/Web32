@@ -22,30 +22,49 @@
 	    "/logout" => "priv/logout.php",
 	    "/home" => "priv/home.php",
 	    "/settings" => "priv/settings.php",
-	    "/transmit" => "priv/transmit.php"
+	    "/transmit" => "priv/transmit.php",
+	    "/api/widgets" => "api/widgets/init.php",
+	    "/api/widgets/*" => "api/widgets/existing.php",
+	    "/api/widgets/*/*" => "api/widgets/existing.php"
 	];
+
+	// A list of all the routes that will not send the header
+	$header_blackisted_routes = ["api"];
 	
+	$root = "User-root/AAC/";
+	$request = substr($_SERVER['REQUEST_URI'], strlen($root));
+
+	if (str_contains($request, "?")) {
+		$request = substr($request, 0, strpos($request, "?"));
+	}
+
 	function BasicAutoLoad($className) {
 		include_once('src/classes/' . $className . '.php');
 	}
 
-
 	spl_autoload_register('BasicAutoLoad');
-	
-	require "src/static/header.html";
 
-	if (array_key_exists('user_entity', $_SESSION)) {
-		require "src/static/templates/header-in.php";
-	} else {
-		require "src/static/templates/header-out.html";
+	$header_blacklisted = false;
+	foreach ($header_blackisted_routes as $b) {
+		if (str_contains($request, $b)) {
+			$header_blacklisted = true;
+		}
+	}
+	
+	if (!$header_blacklisted) {
+		require "src/static/header.html";
+
+		if (array_key_exists('user_entity', $_SESSION)) {
+			require "src/static/templates/header-in.php";
+		} else {
+			require "src/static/templates/header-out.html";
+		}
+
+		require "src/config.php";
 	}
 
-	require "src/config.php";
-
-	$root = "User-root/AAC/";
-	$request = substr($_SERVER['REQUEST_URI'], strlen($root));
-
 	$found = false;
+	$data_flag = false;
 	foreach ($pages as $key => $val) {
 		if ($key == $request) {
 			// Safe Guard: If they aren't logged in, they can't access priv
@@ -57,6 +76,26 @@
 			require "src/$val";
 		}
 
+		if (fnmatch($key, $request)) {
+			// API Wiget Card Wild Card
+			if ($key == "/api/widgets/*") {
+				$wild_card = substr($request, strlen($key) - 1);
+
+				if (str_contains($wild_card, "/")) {
+					$sub = substr($request, strpos($wild_card, "/") - 1);
+					$wild_card = substr($wild_card, 0, strpos($wild_card, "/"));
+					if (fnmatch("/api/widgets/$wild_card/*", $sub)) {
+						$data_key = substr($sub, strlen("/api/widgets/$wild_card/"));
+						$data_flag = true;
+					}
+				}
+
+				
+				require "src/$val";
+			}
+
+			$found = true;
+		}
 	}
 	if (!$found) { require "src/pub/404.php"; }
 
