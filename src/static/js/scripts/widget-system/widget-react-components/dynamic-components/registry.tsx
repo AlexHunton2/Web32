@@ -4,5 +4,6 @@ export var availableWidgets = [
 	"OnOff",
 	"TestForm",
 	"TestLabel",
-	"TestSelfLabel"
+	"TestSelfLabel",
+	"Button"
 ];

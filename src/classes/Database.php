@@ -122,5 +122,13 @@
 				echo $e->getMessage();
 			}
 		}
+
+		protected function delete(string $tbname, string $key_name, string $key_value) {
+			try {
+				$STH = $this->DBH->query("DELETE FROM $tbname WHERE $key_name= '$key_value'");
+			} catch(PDOException $e) {
+				echo $e->getMessage();
+			}
+		}
 	}
 ?>

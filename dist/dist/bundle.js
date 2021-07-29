@@ -30060,6 +30060,17 @@ class BaseHTTP {
         return resData;
     }
     // Make an HTTP PUT Request
+    async delete(url) {
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        const resData = await response;
+        return resData;
+    }
+    // Make an HTTP PUT Request
     async put(data, url) {
         url = url || this.url;
         const response = await fetch(url, {
@@ -30069,7 +30080,7 @@ class BaseHTTP {
             },
             body: JSON.stringify(data)
         });
-        const resData = await response.json();
+        const resData = await response;
         return resData;
     }
 }
@@ -30094,31 +30105,39 @@ __webpack_require__.r(__webpack_exports__);
 class WidgetHTTP extends _api_utility_base_http__WEBPACK_IMPORTED_MODULE_0__.default {
     constructor() {
         super();
+        //this.api_route = "/api/widgets/"; REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
+        this.api_route = "/User-root/AAC/api/";
     }
     createWidget(type, route, label) {
-        //var url = "http://".concat(this.url, "/api/widgets/"); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
-        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets");
+        var url = "http://".concat(this.url, this.api_route, "widgets");
         const data = { 'widget_type': type, 'route': route, 'label': label };
         var response = this.post(data, url);
         return response;
     }
+    deleteWidget(id) {
+        var url = "http://".concat(this.url, this.api_route, "widgets/", String(id));
+        var widget = this.delete(url);
+        return widget;
+    }
     updateWidgetData() { }
-    updateWidgetDefaults() { }
+    updateWidgetDefaults(id, route, label) {
+        var url = "http://".concat(this.url, this.api_route, "widgets/", String(id));
+        const data = { 'widget_route': route, 'widget_label': label };
+        var response = this.put(data, url);
+        return response;
+    }
     getAllWidgets() {
-        //var url = "http://".concat(this.url, "/api/widgets/"); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
-        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets");
+        var url = "http://".concat(this.url, this.api_route, "widgets");
         var widgets = this.get(url);
         return widgets;
     }
     getWidget(id) {
-        //var url = "http://".concat(this.url, "/api/widgets/", String(id)); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
-        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets/", String(id));
+        var url = "http://".concat(this.url, this.api_route, "widgets/", String(id));
         var widget = this.get(url);
         return widget;
     }
     getWidgetData(id) {
-        //var url = "http://".concat(this.url, "/api/widgets/", String(id), "/*"); REPLACE WITH THIS WHEN ON ACTUAL DOMAIN
-        var url = "http://".concat(this.url, "/User-root/AAC/api/widgets/", String(id), "/*");
+        var url = "http://".concat(this.url, this.api_route, "widgets/", String(id), "/*");
         var data = this.get(url);
         return data;
     }
@@ -30184,7 +30203,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _static_components_ErrorBoundary__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./static-components/ErrorBoundary */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/ErrorBoundary.tsx");
 /* harmony import */ var _static_components_AddWidget__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./static-components/AddWidget */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/AddWidget.tsx");
 /* harmony import */ var _static_components_Alerts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./static-components/Alerts */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/Alerts.tsx");
-/* harmony import */ var _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../widget-structures/widget-structure */ "./src/static/js/scripts/widget-system/widget-structures/widget-structure.tsx");
+/* harmony import */ var _static_components_SettingsModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./static-components/SettingsModal */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/SettingsModal.tsx");
+/* harmony import */ var _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../widget-structures/widget-structure */ "./src/static/js/scripts/widget-system/widget-structures/widget-structure.tsx");
+
 
 
 
@@ -30195,13 +30216,8 @@ __webpack_require__.r(__webpack_exports__);
 class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     constructor(props) {
         super(props);
-        this.handleSettingsClick = struct => event => {
-            console.log("Settings!");
-            console.log(struct.getPair("type"));
-            event.preventDefault();
-        };
         var widgetstruct = [];
-        var widgets = _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_4__.requestWidgets();
+        var widgets = _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_5__.requestWidgets();
         var self = this;
         widgets.then(widgets => {
             widgets.forEach(function (widget) {
@@ -30210,9 +30226,8 @@ class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
             self.refresh();
         });
         this.state = {
-            DynamicWidgetComponents: widgetstruct
+            DynamicWidgetComponents: widgetstruct,
         };
-        this.handleSettingsClick = this.handleSettingsClick.bind(this);
         this.getDynamicComponents = this.getDynamicComponents.bind(this);
         this.updateDynamicComponents = this.updateDynamicComponents.bind(this);
         this.refresh = this.refresh.bind(this);
@@ -30232,10 +30247,10 @@ class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
             DynamicWidgetComponents: widgetstruct
         }));
     }
-    // So this a goober function. It will basically just ask the server for the Widgets. Should center the app when it goes wack
+    // Reloads the WidgetSystem and asks for the most current data. Idk if this is react mindset.
     refreshWithRequest() {
         var widgetstruct = [];
-        var widgets = _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_4__.requestWidgets();
+        var widgets = _widget_structures_widget_structure__WEBPACK_IMPORTED_MODULE_5__.requestWidgets();
         var self = this;
         widgets.then(widgets => {
             widgets.forEach(function (widget) {
@@ -30244,6 +30259,7 @@ class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
             self.updateDynamicComponents(widgetstruct);
         });
     }
+    // Reloads the WidgetSystem with existing data. Does not request new data.
     refresh() {
         this.updateDynamicComponents(this.getDynamicComponents());
     }
@@ -30255,17 +30271,19 @@ class WidgetSystem extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(_static_components_ErrorBoundary__WEBPACK_IMPORTED_MODULE_1__.default, null,
                         this.state.DynamicWidgetComponents.map((struct) => {
                             const DynamicComponent = react__WEBPACK_IMPORTED_MODULE_0__.lazy(() => __webpack_require__("./src/static/js/scripts/widget-system/widget-react-components/dynamic-components lazy recursive ^\\.\\/Widget.*$")("./Widget" + struct.getPair("type")));
-                            return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { key: struct.getPair("dbID") },
-                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card border-light mb-5" },
-                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-title text-right" },
-                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { className: "btn", onClick: this.handleSettingsClick(struct) },
-                                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", fill: "currentColor", className: "bi bi-gear", viewBox: "0 0 16 16" },
-                                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" }),
-                                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" })))),
-                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-body" },
-                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(DynamicComponent, { structure: struct, updateDynamicComponents: this.updateDynamicComponents, getDynamicComponents: this.getDynamicComponents })),
-                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-footer text-center" },
-                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, struct.getPair("label"))))));
+                            return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { key: "DynamicComp_" + struct.getPair('dbID') },
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_static_components_SettingsModal__WEBPACK_IMPORTED_MODULE_4__.default, { struct: struct, refreshWithRequest: this.refreshWithRequest }),
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { key: struct.getPair("dbID") },
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card border-light mb-5" },
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-title text-right" },
+                                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { className: "btn", "data-toggle": "modal", "data-target": "#SettingsModal_" + struct.getPair('dbID') },
+                                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", fill: "currentColor", className: "bi bi-gear", viewBox: "0 0 16 16" },
+                                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" }),
+                                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", { d: "M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" })))),
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-body" },
+                                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(DynamicComponent, { structure: struct, updateDynamicComponents: this.updateDynamicComponents, getDynamicComponents: this.getDynamicComponents })),
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "card-footer text-center" },
+                                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, struct.getPair("label")))))));
                         }),
                         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_static_components_AddWidget__WEBPACK_IMPORTED_MODULE_2__.default, { updateDynamicComponents: this.updateDynamicComponents, getDynamicComponents: this.getDynamicComponents, refresh: this.refresh, refreshWithRequest: this.refreshWithRequest }))))));
     }
@@ -30290,7 +30308,8 @@ var availableWidgets = [
     "OnOff",
     "TestForm",
     "TestLabel",
-    "TestSelfLabel"
+    "TestSelfLabel",
+    "Button"
 ];
 
 
@@ -30356,7 +30375,7 @@ class AddWidget extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
                                 react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
                                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Type"),
                                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("select", { id: "createType", className: "form-control" }, _dynamic_components_registry__WEBPACK_IMPORTED_MODULE_1__.availableWidgets.map((widget_name) => {
-                                        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", { key: Math.floor(Math.random() * 200) + 1 }, widget_name));
+                                        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", { key: Math.floor(Math.random() * 3000) + 1 }, widget_name));
                                     }))),
                                 react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
                                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Route"),
@@ -30544,6 +30563,118 @@ class ErrorBoundary extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
 
 /***/ }),
 
+/***/ "./src/static/js/scripts/widget-system/widget-react-components/static-components/SettingsModal.tsx":
+/*!*********************************************************************************************************!*\
+  !*** ./src/static/js/scripts/widget-system/widget-react-components/static-components/SettingsModal.tsx ***!
+  \*********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _Alerts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Alerts */ "./src/static/js/scripts/widget-system/widget-react-components/static-components/Alerts.tsx");
+/* harmony import */ var _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../api-utility/widget-http */ "./src/static/js/scripts/api-utility/widget-http.tsx");
+
+
+
+class SettingsModal extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
+    constructor(props) {
+        super(props);
+        this.handleSettingsSave = event => {
+            var struct = this.props.struct;
+            const route = document.getElementById("SettingsRoute_" + struct.getPair('dbID')).value;
+            const label = document.getElementById("SettingsLabel_" + struct.getPair('dbID')).value;
+            var widget_http = new _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_2__.default();
+            var response = widget_http.updateWidgetDefaults(struct.getPair('dbID'), route, label);
+            var self = this;
+            response.then(response => {
+                if (response.status <= 300) {
+                    _Alerts__WEBPACK_IMPORTED_MODULE_1__.AlertQueue.queueAlert("SUCCESS", "Successfully updated widget!");
+                }
+                else {
+                    _Alerts__WEBPACK_IMPORTED_MODULE_1__.AlertQueue.queueAlert("DANGER", "Failed to update widget. Status Code: " + response.status + " " + response.statusText);
+                    this.refreshInputs();
+                }
+                self.props.refreshWithRequest();
+            });
+            event.preventDefault();
+        };
+        this.handleSettingsClose = event => {
+            this.refreshInputs();
+            event.preventDefault();
+        };
+        this.handleWidgetDelete = event => {
+            var struct = this.props.struct;
+            var widget_http = new _api_utility_widget_http__WEBPACK_IMPORTED_MODULE_2__.default();
+            var response = widget_http.deleteWidget(struct.getPair('dbID'));
+            var self = this;
+            response.then(response => {
+                if (response.status <= 300) {
+                    _Alerts__WEBPACK_IMPORTED_MODULE_1__.AlertQueue.queueAlert("SUCCESS", "Successfully deleted widget!");
+                }
+                else {
+                    _Alerts__WEBPACK_IMPORTED_MODULE_1__.AlertQueue.queueAlert("DANGER", "Failed to delete widget. Status Code: " + response.status + " " + response.statusText);
+                }
+                self.props.refreshWithRequest();
+            });
+            event.preventDefault();
+        };
+        this.state = {
+            label: this.props.struct.getPair('label'),
+            route: this.props.struct.getPair('route')
+        };
+        this.handleWidgetDelete = this.handleWidgetDelete.bind(this);
+        this.handleSettingsSave = this.handleSettingsSave.bind(this);
+        this.refreshInputs = this.refreshInputs.bind(this);
+    }
+    componentDidMount() {
+        this.refreshInputs();
+    }
+    refreshInputs() {
+        var struct = this.props.struct;
+        const route = document.getElementById("SettingsRoute_" + struct.getPair('dbID'));
+        const label = document.getElementById("SettingsLabel_" + struct.getPair('dbID'));
+        label.value = this.props.struct.getPair('label');
+        route.value = this.props.struct.getPair('route');
+        this.setState({
+            label: this.props.struct.getPair('label'),
+            route: this.props.struct.getPair('route')
+        });
+    }
+    render() {
+        var struct = this.props.struct;
+        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal fade", id: "SettingsModal_" + struct.getPair('dbID'), role: "dialog", "aria-labelledby": "SettingsLabel_" + struct.getPair('dbID'), "aria-hidden": "true" },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-dialog", role: "document" },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-content" },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-header" },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", { className: "modal-title", id: "SettingsLabel_" + struct.getPair('dbID') }, "Widget Settings"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "close", onClick: this.handleSettingsClose, "data-dismiss": "modal", "aria-label": "Close" },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { "aria-hidden": "true" }, "\u00D7"))),
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-body" },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null,
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Type"),
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", { type: "text", placeholder: struct.getPair('type'), className: "form-control", id: "SettingsType_" + struct.getPair('dbID'), readOnly: true })),
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Route"),
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", { type: "text", defaultValue: this.state.route, className: "form-control", id: "SettingsRoute_" + struct.getPair('dbID') })),
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "form-group" },
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, "Label"),
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", { type: "text", defaultValue: this.state.label, className: "form-control", id: "SettingssLabel_" + struct.getPair('dbID'), placeholder: "Enter Label" })))),
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: "modal-footer" },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "btn btn-danger mr-auto", onClick: this.handleWidgetDelete, "data-dismiss": "modal" }, "Delete"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "btn btn-secondary", onClick: this.handleSettingsClose, "data-dismiss": "modal" }, "Close"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", className: "btn btn-primary", onClick: this.handleSettingsSave, "data-dismiss": "modal" }, "Save Changes"))))));
+    }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SettingsModal);
+
+
+/***/ }),
+
 /***/ "./src/static/js/scripts/widget-system/widget-structures/widget-structure.tsx":
 /*!************************************************************************************!*\
   !*** ./src/static/js/scripts/widget-system/widget-structures/widget-structure.tsx ***!
@@ -30716,6 +30847,16 @@ function requestWidgets() {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var map = {
+	"./WidgetButton": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetButton.tsx",
+		"vendors-node_modules_react-bootstrap_esm_Button_js-node_modules_react-bootstrap_esm_Spinner_js",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetButton_tsx"
+	],
+	"./WidgetButton.tsx": [
+		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetButton.tsx",
+		"vendors-node_modules_react-bootstrap_esm_Button_js-node_modules_react-bootstrap_esm_Spinner_js",
+		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetButton_tsx"
+	],
 	"./WidgetOnOff": [
 		"./src/static/js/scripts/widget-system/widget-react-components/dynamic-components/WidgetOnOff.tsx",
 		"src_static_js_scripts_widget-system_widget-react-components_dynamic-components_WidgetOnOff_tsx"
@@ -30759,7 +30900,7 @@ function webpackAsyncContext(req) {
 	}
 
 	var ids = map[req], id = ids[0];
-	return __webpack_require__.e(ids[1]).then(() => {
+	return Promise.all(ids.slice(1).map(__webpack_require__.e)).then(() => {
 		return __webpack_require__(id);
 	});
 }
@@ -30799,6 +30940,18 @@ module.exports = webpackAsyncContext;
 /******/ 	__webpack_require__.m = __webpack_modules__;
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports

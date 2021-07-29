@@ -50,6 +50,10 @@
 
 		}
 
+		public function deleteWidget(int $widget_id) {
+			$this->delete('widgets', 'widget_id', $widget_id);
+		}
+
 		// Checks if a widget_id is associated with a user
 		public function isOwnedByUser(int $user_id, int $widget_id) {
 			$widgets_of_user = $this->getWidgetsFromUser($user_id);

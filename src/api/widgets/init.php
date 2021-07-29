@@ -1,5 +1,5 @@
 <?php
-	//require "error_response.php";
+	require "error_response.php";
 	
 	$widgetDB = new WidgetDB();
 	$user_entity = unserialize($_SESSION['user_entity']);
@@ -8,18 +8,7 @@
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		// CREATE NEW WIDGET
 		$raw = file_get_contents('php://input');
-
 		$body_data = json_decode($raw, true);
-
-		$test = ['hello' => ":)"];
-
-		/*
-		if (!(isset($body_data['widget_type']) || isset($body_data['label']) || isset($body_data['route']))) {
-			http_response_code(400);
-			exit;
-		}
-		*/
- 		
 
 		try {
 			$widget_type = $body_data['widget_type'];
@@ -28,8 +17,7 @@
 
 			$widgetDB->addNewWidget($user_id, $widget_type, $label, $route);
 
-			echo json_encode($test);
-			http_response_code(200);
+			http_response_code(204);
 			exit;
 		} catch (Exception $e) {}
 

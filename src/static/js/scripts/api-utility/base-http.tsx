@@ -8,7 +8,7 @@ class BaseHTTP {
 	}
 
 	// Make an HTTP GET Request 
-    async get(url: string) {
+    protected async get(url: string) {
         const response = await fetch(url, {
         	method: 'GET',
         	headers : {
@@ -21,7 +21,7 @@ class BaseHTTP {
     }
   
     // Make an HTTP POST Request
-    async post(data, url?: string) {
+    protected async post(data, url?: string) {
     	url = url || this.url;
         const response = await fetch(url, {
             method: 'POST',
@@ -32,12 +32,24 @@ class BaseHTTP {
         });
   
         const resData = await response;
-  
         return resData;
     }
 
     // Make an HTTP PUT Request
-    async put(data, url?: string) {
+    protected async delete(url: string) {
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers : {
+                'Accept': 'application/json'
+            }
+        });
+  
+        const resData = await response;
+        return resData;
+    }
+
+    // Make an HTTP PUT Request
+    protected async put(data, url?: string) {
     	url = url || this.url;
         const response = await fetch(url, {
             method: 'PUT',
@@ -47,8 +59,7 @@ class BaseHTTP {
             body: JSON.stringify(data)
         });
   
-        const resData = await response.json();
-
+        const resData = await response
         return resData;
     }
 }

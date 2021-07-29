@@ -65,7 +65,7 @@ class AddWidget extends React.Component<AddWidgetProps,AddWidgetState> {
 					        	<select id="createType" className="form-control">
 					        		{availableWidgets.map((widget_name) => {
 					        			return(
-					        					<option key={Math.floor(Math.random() * 200) + 1}>{widget_name}</option>
+					        					<option key={Math.floor(Math.random() * 3000) + 1}>{widget_name}</option>
 					        				)
 					        			})
 					        		}

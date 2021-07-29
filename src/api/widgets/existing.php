@@ -50,26 +50,41 @@
 		exit;
 	}
 
+	if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+		$widgetDB->deleteWidget($widget_id);
+
+		echo $widget_id;
+		http_response_code(200);
+		exit;
+	}
+
 	if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-		if (isset($_PUT['body'])) {
-			$body_data = json_decode($_PUT['body']);
-		} else {
-			http_response_code(400);
+		$raw = file_get_contents('php://input');
+		$body_data = json_decode($raw, true);
+
+		if (array_key_exists('widget_label', $body_data) && array_key_exists('widget_route', $body_data)) {
+			$new_defaults = [
+				'label'=> $body_data['widget_label'],
+				'route'=> $body_data['widget_route'],
+				'user_id'=> $user_id
+			];
+			$widgetDB->updateExistingWidget($widget_id, $new_defaults);
+
+			//echo json_encode($new_defaults);
+			http_response_code(200);
 			exit;
 		}
 
-		if (array_key_contains('label', $body_data) && array_key_contains('route', $body_data) && array_key_contains('widget_id', $body_data)) {
-			$new_defaults = [
-				'label'=> $body_data['widget_type'],
-				'route'=> $body_data['widget_type'],
-				'user_id'=> $user_id
-			];
-			$widgetDB->updateExistingWidget($new_defaults, $body_data['widget_id']);
+		if (array_key_exists('widget_key', $body_data) && array_key_exists('widget_value', $body_data)) {
+			$widgetDB->updateWidgetData($widget_id, $body_data['widget_key'], $body_data['widget_value']);
+			
+			//echo json_encode(Array($body_data['widget_key'], $body_data['widget_value']));
+			http_response_code(200);
+			exit;
 		}
 
-		if (array_key_contains('widget_key', $body_data) && array_key_contains('widget_value', $body_data)) {
-			$widgetDB->updateWidgetData($widget_id, $body_data['widget_key'], $body_data['widget_value']);
-		}
+		http_response_code(406);
+		exit;
 	}
 
 ?>
