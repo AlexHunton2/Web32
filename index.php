@@ -31,7 +31,7 @@
 	// A list of all the routes that will not send the header
 	$header_blackisted_routes = ["api"];
 	
-	$root = "User-root/AAC/";
+	$root = "Web32/";
 	$request = substr($_SERVER['REQUEST_URI'], strlen($root));
 
 	if (str_contains($request, "?")) {
