@@ -1,11 +1,12 @@
 <?php
-	// abstract class Database {
-	class Database {
+	abstract class Database {
 		protected $DBH;
 		protected $tables;
 		protected $dbname;
 
-
+		/**
+		 * Establishes a connection to a database
+		 */
 		public function __construct(string $host, string $dbname, string $user, string $pass) {
 			$this->dbname = $dbname;
 
@@ -14,12 +15,50 @@
 				$this->DBH = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
 			} catch (PDOException $e) {
 				echo $e->getMessage();
+				$this->__destruct();
 			}
 
 			$this->performTableQuery();
 		}
 
-		// Create an array for all the tables in the database and returns it
+		/**
+		 * Destructs the database object: closes connections
+		 */
+		public function __destruct(){
+			if ($this->DBH != null) {
+				$this->DBH = null;
+			}
+		}
+
+		/**
+		 * Static function creates the database if it not already created
+		 * @param host The hostname for the database server
+		 * @param root The root username
+		 * @param root_password The associated password for root
+		 * @param user The username to be created to access the newly created database
+		 * @param pass The password for the user that can access the database
+		 * @param dbname The name of the newly created database
+		 */
+		public static function create($host, $root, $root_password, $user, $pass, $dbname) {
+			try {
+				$dbh = new PDO("mysql:host=$host", $root, $root_password);
+		
+				$dbh->exec("CREATE DATABASE IF NOT EXISTS `$dbname`;
+						CREATE USER IF NOT EXISTS '$user'@'localhost' IDENTIFIED BY '$pass';
+						GRANT ALL ON `$dbname`.* TO '$user'@'localhost';
+						FLUSH PRIVILEGES;")
+				or die(print_r($dbh->errorInfo(), true));
+		
+			}
+			catch (PDOException $e) {
+				die("DB ERROR: " . $e->getMessage());
+			}
+		}
+		
+		/** 
+		 * Create an array for all the tables in the database and returns it
+		 * @return Array of all the tables in the connected database
+		 */
 		protected function performTableQuery() { 
 			$this->tables = array();
 			$table_names = array();
@@ -56,9 +95,10 @@
 			}
 		}
 
-		// Insert a new row into a table
-		// $tbname = The name of the table
-		// $values = An array of the values for the inserted row *IN ORDER* 
+		/** Insert a new row into a table
+		* @param tbname = The name of the table
+		* @param values = An array of the values for the inserted row *IN ORDER* 
+		*/
 		protected function insert(string $tbname, array $values) {
 			// Hacky Solution: Create an array with "?" per column then implode it to work with PDOs
 			$keys = $this->tables[$tbname];
@@ -78,10 +118,11 @@
 
 		}
 
-		// Update an existing row for a table
-		// $tbname = The name of the table
-		// $values = An arry of the values, KEYS MUST BE COLUMN NAMES
-		// $tb_id = An array with a size of 1, contains key and value for an unique id to the row(s)
+		/** Update an existing row for a table
+		* @param tbname = The name of the table
+		* @param values = An arry of the values, KEYS MUST BE COLUMN NAMES
+		* @param tb_id = An array with a size of 1, contains key and value for an unique id to the row(s)
+		*/
 		protected function update(string $tbname, array $values, array $tb_id) {
 			// Unique key and value
 			$identifier = array();
@@ -108,11 +149,14 @@
 			}
 		}
 
-		// Select an existing row from a table
-		// $tbname = Table name
-		// $key_name = The column name for the key
-		// $key_value = The value of the row for that column
-		// $pdo_fetch = Which type of fetch for the resulting row
+		/** 
+		* Select an existing row from a table
+		* @param tbname = Table name
+		* @param key_name = The column name for the key
+		* @param key_value = The value of the row for that column
+		* @param pdo_fetch = Which type of fetch for the resulting row
+		* @return Array of the data selected
+		*/
 		protected function select(string $tbname, string $key_name, string $key_value, $pdo_fetch) {
 			try {
 				$STH = $this->DBH->query("SELECT * FROM $tbname WHERE $key_name= '$key_value'");
@@ -123,6 +167,13 @@
 			}
 		}
 
+
+		/**
+		 * Deletes a key,value pair from a table
+		 * @param tbname = Table name
+		 * @param key_name = The column name for the key
+		 * @param key_value = The actual value of the key
+		 */
 		protected function delete(string $tbname, string $key_name, string $key_value) {
 			try {
 				$STH = $this->DBH->query("DELETE FROM $tbname WHERE $key_name= '$key_value'");
